@@ -8,7 +8,7 @@ pipeline {
                 git url: 'https://github.com/Ariel-Chau/COMP367-Lab-ArielZhou.git'
                 
                 // Build Maven project
-                sh 'mvn clean install'
+                bash 'mvn clean install'
             }
         }
         
