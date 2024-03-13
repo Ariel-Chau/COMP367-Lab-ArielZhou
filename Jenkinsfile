@@ -7,7 +7,8 @@ pipeline {
     }
 
     stages {
-        stage('Checkout and Build') {
+        stage('Checkout and Build') 
+        {
             steps 
             {
                 // Get some code from a GitHub repository
@@ -29,6 +30,13 @@ pipeline {
                     archiveArtifacts 'target/*.jar'
                 }
             }
+        }
+        stage("Build docker image"){
+        	steps{
+        		script{
+        				bat "docker build -t arielchau/COMP367-Lab2-ArielZhou ."
+        			}
+        	}
         }
     }
 }
