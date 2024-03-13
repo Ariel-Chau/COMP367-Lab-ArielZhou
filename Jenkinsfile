@@ -19,6 +19,8 @@ pipeline {
 
                 // To run Maven on a Windows agent, use
                 bat "mvn -Dmaven.test.failure.ignore=true clean package"
+                
+                bat "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package"
             }
             
 
@@ -31,6 +33,27 @@ pipeline {
                 }
             }
         }
+        
+        stage("Code Coverage") {
+            steps {
+                script {
+                    // Publish Jacoco coverage report
+                    bat "mvn org.jacoco:jacoco-maven-plugin:report"
+                    jacoco(execPattern: 'target/**.exec')
+                }
+                post {
+                    always {
+                        // Archive Jacoco reports
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/site/jacoco', reportFiles: 'index.html', reportName: 'Code Coverage Report'])
+                    }
+                }
+            }
+        }
+        
+        
+        
+        
+        
         stage("Build docker image"){
         	steps{
         		script{
