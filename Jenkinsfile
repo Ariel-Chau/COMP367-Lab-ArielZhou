@@ -38,5 +38,17 @@ pipeline {
         			}
         	}
         }
+        stage("Push image to hub"){
+        	steps{
+        		script{
+        			withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) 
+        			{
+        			bat 'docker login -u arielchau -p ${dockerhubpwd}'
+    
+					}
+					bat 'docker push arielchau/comp367-lab2-arielzhou '
+        		}
+        	}
+        }
     }
 }
