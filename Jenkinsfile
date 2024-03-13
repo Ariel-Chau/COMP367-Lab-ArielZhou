@@ -34,21 +34,7 @@ pipeline {
             }
         }
         
-        stage("Code Coverage") {
-            steps {
-                script {
-                    // Publish Jacoco coverage report
-                    bat "mvn org.jacoco:jacoco-maven-plugin:report"
-                    jacoco(execPattern: 'target/**.exec')
-                }
-                post {
-                    always {
-                        // Archive Jacoco reports
-                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/site/jacoco', reportFiles: 'index.html', reportName: 'Code Coverage Report'])
-                    }
-                }
-            }
-        }
+       
         
         
         
@@ -72,6 +58,22 @@ pipeline {
 					bat 'docker push arielchau/comp367-lab2-arielzhou '
         		}
         	}
+        }
+        
+         stage("Code Coverage") {
+            steps {
+                script {
+                    // Publish Jacoco coverage report
+                    bat "mvn org.jacoco:jacoco-maven-plugin:report"
+                    jacoco(execPattern: 'target/**.exec')
+                }
+                post {
+                    always {
+                        // Archive Jacoco reports
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/site/jacoco', reportFiles: 'index.html', reportName: 'Code Coverage Report'])
+                    }
+                }
+            }
         }
     }
 }
