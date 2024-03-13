@@ -46,6 +46,7 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
+		<finalName>COMP367-Lab2-ArielZhou</finalName>
 	</build>
 
 </project>
