@@ -7,26 +7,14 @@ pipeline {
     }
 
     stages {
-        stage('Checkout and Build') 
-        {
-            steps 
-            {
+        stage('Checkout and Build') {
+            steps {
                 // Get some code from a GitHub repository
                 git branch: 'master', url: 'https://github.com/Ariel-Chau/COMP367-Lab-ArielZhou.git'
-
-                // Run Maven on a Unix agent.
-                //sh "mvn -Dmaven.test.failure.ignore=true clean package"
-
-                // To run Maven on a Windows agent, use
-                bat "mvn -Dmaven.test.failure.ignore=true clean package"
-                
-               
+                // Run Maven with Jacoco for code coverage
+                bat "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package"
             }
-            
-
             post {
-                // If Maven was able to run the tests, even if some of the test
-                // failed, record the test results and archive the jar file.
                 success {
                     junit '**/target/surefire-reports/TEST-*.xml'
                     archiveArtifacts 'target/*.jar'
@@ -34,32 +22,39 @@ pipeline {
             }
         }
         
-       
-        
-        
-        
-        
-        
-        stage("Build docker image"){
-        	steps{
-        		script{
-        				bat "docker build -t arielchau/comp367-lab2-arielzhou ."
-        			}
-        	}
-        }
-        stage("Push image to hub"){
-        	steps{
-        		script{
-        			withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) 
-        			{
-        			bat 'docker login -u arielchau -p "h@ND!Dr001"'
-    
-					}
-					bat 'docker push arielchau/comp367-lab2-arielzhou '
-        		}
-        	}
+        stage("Code Coverage") {
+            steps {
+                script {
+                    // Publish Jacoco coverage report
+                    bat "mvn org.jacoco:jacoco-maven-plugin:report"
+                    jacoco(execPattern: 'target/**.exec')
+                }
+                post {
+                    always {
+                        // Archive Jacoco reports
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/site/jacoco', reportFiles: 'index.html', reportName: 'Code Coverage Report'])
+                    }
+                }
+            }
         }
         
-      
+        stage("Build docker image") {
+            steps {
+                script {
+                    bat "docker build -t arielchau/comp367-lab2-arielzhou ."
+                }
+            }
+        }
+        
+        stage("Push image to hub") {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                        bat 'docker login -u arielchau -p "h@ND!Dr001"'
+                    }
+                    bat 'docker push arielchau/comp367-lab2-arielzhou '
+                }
+            }
+        }
     }
 }
