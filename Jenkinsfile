@@ -34,7 +34,7 @@ pipeline {
         stage("Build docker image"){
         	steps{
         		script{
-        				bat "docker build -t arielchau/COMP367-Lab2-ArielZhou ."
+        				bat "docker build -t arielchau/comp367-lab2-arielzhou ."
         			}
         	}
         }
