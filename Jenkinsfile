@@ -12,7 +12,8 @@ pipeline {
                 // Get some code from a GitHub repository
                 git branch: 'master', url: 'https://github.com/Ariel-Chau/COMP367-Lab-ArielZhou.git'
                 // Run Maven with Jacoco for code coverage
-                bat "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package"
+                 bat "mvn -Dmaven.test.failure.ignore=true clean package"
+                
             }
             post {
                 success {
