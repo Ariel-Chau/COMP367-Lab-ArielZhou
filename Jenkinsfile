@@ -30,10 +30,8 @@ pipeline {
                       sourcePattern: 'src/main/java',
                       exclusionPattern: 'src/test*'
                 )
-            }
-        }
-        
-        
+            }
+        }
         
         stage("Build docker image") {
             steps {
@@ -54,5 +52,4 @@ pipeline {
             }
         }
     }
-}
-}
+} // Closing curly brace added here
