@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Checkout and Build') {
             steps {
-                // Get some code from a GitHub repository
+                // Get some code from a GitHub repository.
                 git branch: 'master', url: 'https://github.com/Ariel-Chau/COMP367-Lab-ArielZhou.git'
                 // Run Maven with Jacoco for code coverage
                 bat "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package"
@@ -22,21 +22,17 @@ pipeline {
             }
         }
         
-        stage("Code Coverage") {
+        stage('Code Coverage (JaCoCo)') {
             steps {
-                script {
-                    // Publish Jacoco coverage report
-                    bat "mvn org.jacoco:jacoco-maven-plugin:report"
-                    jacoco(execPattern: 'target/**.exec')
-                }
-                post {
-                    always {
-                        // Archive Jacoco reports
-                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/site/jacoco', reportFiles: 'index.html', reportName: 'Code Coverage Report'])
-                    }
-                }
-            }
-        }
+                jacoco(
+                
+                      execPattern: 'target/*.exec',
+                      classPattern: 'target/classes',
+                      sourcePattern: 'src/main/java',
+                      exclusionPattern: 'src/test*'
+                )
+            }
+        }
         
         stage("Build docker image") {
             steps {
