@@ -29,12 +29,7 @@ pipeline {
                     bat "mvn org.jacoco:jacoco-maven-plugin:report"
                     jacoco(execPattern: 'target/**.exec')
                 }
-                post {
-                    always {
-                        // Archive Jacoco reports
-                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/site/jacoco', reportFiles: 'index.html', reportName: 'Code Coverage Report'])
-                    }
-                }
+                
             }
         }
         
