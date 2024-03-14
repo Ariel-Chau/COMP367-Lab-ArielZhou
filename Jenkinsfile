@@ -12,8 +12,7 @@ pipeline {
                 // Get some code from a GitHub repository
                 git branch: 'master', url: 'https://github.com/Ariel-Chau/COMP367-Lab-ArielZhou.git'
                 // Run Maven with Jacoco for code coverage
-                 bat "mvn -Dmaven.test.failure.ignore=true clean package"
-                
+                bat "mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package"
             }
             post {
                 success {
@@ -23,18 +22,33 @@ pipeline {
             }
         }
         
-        stage('Code Coverage (JaCoCo)') {
+        stage("Code Coverage") {
             steps {
-                jacoco(
-                      execPattern: 'target/*.exec',
-                      classPattern: 'target/classes',
-                      sourcePattern: 'src/main/java',
-                      exclusionPattern: 'src/test*'
-                )
+                script {
+                    // Publish Jacoco coverage report
+                    bat "mvn org.jacoco:jacoco-maven-plugin:report"
+                    jacoco(execPattern: 'target/**.exec')
+                }
+                post {
+                    always {
+                        // Archive Jacoco reports
+                        publishHTML([allowMissing: false, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'target/site/jacoco', reportFiles: 'index.html', reportName: 'Code Coverage Report'])
+                    }
+                }
             }
         }
         
-        stage("Build docker image") {
+        stage("Login to Docker Hub") {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
+                        bat 'docker login -u arielchau -p "h@ND!Dr001"'
+                    }
+                }
+            }
+        }
+        
+        stage("Build Docker Image") {
             steps {
                 script {
                     bat "docker build -t arielchau/comp367-lab2-arielzhou ."
@@ -42,15 +56,12 @@ pipeline {
             }
         }
         
-        stage("Push image to hub") {
+        stage("Push Image to Docker Hub") {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                        bat 'docker login -u arielchau -p "h@ND!Dr001"'
-                    }
                     bat 'docker push arielchau/comp367-lab2-arielzhou '
                 }
             }
         }
     }
-} // Closing curly brace added here
+}
